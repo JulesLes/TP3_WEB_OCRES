@@ -1,31 +1,51 @@
 
 // Fonction appelée lors du click du bouton
 function start() {
-  // Création de l'objet apiWeather
-  const apiWeather = new API_WEATHER();
-  // Appel de la fonction fetchTodayForecast
+var city = document.getElementById("city-input").value;
+// Création de l'objet apiWeather
+const apiWeather = new API_WEATHER(city);
 
-  apiWeather
-    .fetchTodayForecast()
+// Si aucune ville n'est définie
+if(city === ""){
+  city = "paris";
+}
+// Appel de la fonction fetchTodayForecast
+apiWeather
+
+    .fetchThreeDaysForecast(city)
     .then(function(response) {
-      // Récupère la donnée d'une API
-      const data = response.data;
 
-      // On récupère l'information principal
-      const main = data.weather[0].main;
-      const description = data.weather[0].description;
-      const temp = data.main.temp;
-      const icon = apiWeather.getHTMLElementFromIcon(data.weather[0].icon);
+        console.log(response.data);
+        // Récupère la donnée d'une API
+        const data = response.data;
 
-      // Modifier le DOM
-      document.getElementById('today-forecast-main').innerHTML = main;
-      document.getElementById('today-forecast-more-info').innerHTML = description;
-      document.getElementById('icon-weather-container').innerHTML = icon;
-      document.getElementById('today-forecast-temp').innerHTML = `${temp}°C`;
-      
+        for(i = 0; i <= 3; i++) {
+            htmlElement = "today";
+            if(i == 1) {
+                htmlElement = "tomorrow";
+            }
+            else if(i == 2) {
+                htmlElement = "a-tomorrow";
+            }
+            else if(i == 3) {
+                htmlElement = "a-a-tomorrow";
+            }
+            // On récupère l'information principal
+            const main = data.list[i].weather[0].main;
+            const description = data.list[i].weather[0].description;
+            const temp = data.list[i].temp.day;
+            const icon = apiWeather.getHTMLElementFromIcon(data.list[i].weather[0].icon);
+
+            // Modifier le DOM
+            document.getElementById(htmlElement+'-forecast-main').innerHTML = main;
+            document.getElementById(htmlElement+'-forecast-more-info').innerHTML = description;
+            document.getElementById(htmlElement+'-icon-weather-container').innerHTML = icon;
+            document.getElementById(htmlElement+'-forecast-temp').innerHTML = `${temp}°C`;
+        }
     })
     .catch(function(error) {
-      // Affiche une erreur
-      console.error(error);
+
+        // Affiche une erreur
+        console.error(error);
     });
 }
